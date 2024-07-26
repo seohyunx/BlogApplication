@@ -1,0 +1,60 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.3.2'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.shr'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs += ['-parameters']
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.h2database:h2'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// SLF4J API
+    implementation 'org.slf4j:slf4j-api:2.0.0'
+	// Logback (SLF4J의 기본 구현체)
+	implementation 'ch.qos.logback:logback-classic:1.4.6'
+
+	// 타임리프 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// 자동 재빌드를 위한 의존성 추가
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// JUnit 5 의존성
+	//testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+	//testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+test {
+	useJUnitPlatform()
+}
