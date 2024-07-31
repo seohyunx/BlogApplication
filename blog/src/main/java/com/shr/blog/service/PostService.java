@@ -39,7 +39,7 @@ public class PostService {
      * @return 게시물 목록을 담은 List<PostEntity>
      */
     public List<PostEntity> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc();
+        return postRepository.findAllByOrderByIdDesc();
     }
 
     /**

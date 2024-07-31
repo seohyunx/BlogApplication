@@ -43,12 +43,11 @@ dependencies {
 	// 타임리프 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-	// 자동 재빌드를 위한 의존성 추가
+	// 자동 빌드를 위한 의존성 추가
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	// JUnit 5 의존성
-	//testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-	//testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+	// Spring Security 의존성 추가
+	implementation "org.springframework.boot:spring-boot-starter-security"
 }
 
 tasks.named('test') {
