@@ -29,8 +29,9 @@ public class PostEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "writer", nullable = false)
-    private String writer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer_id", nullable = false)
+    private User writer;
 
     // 생성 시간, 수정 시간 추가
     @CreatedDate        // 엔티티가 생성될 때 생성 시간 저장
@@ -42,14 +43,14 @@ public class PostEntity {
     private LocalDateTime updatedAt;
 
     @Builder            // 빌더 패턴으로 객체 생성
-    public PostEntity(String title, String content, String writer) {
+    public PostEntity(String title, String content, User writer) {
         this.title = title;
         this.content = content;
         this.writer = writer;
     }
 
     // update: 요청받은 내용으로 값을 수정하는 메서드
-    public void update(String title, String content, String writer) {
+    public void update(String title, String content, User writer) {
         this.title = title;
         this.content = content;
         this.writer = writer;
@@ -66,7 +67,7 @@ public class PostEntity {
                 .id(postEntity.getId())
                 .title(postEntity.getTitle())
                 .content(postEntity.getContent())
-                .writer(postEntity.getWriter())
+                .writer(postEntity.getWriter() != null ? postEntity.getWriter().getNickname() : "Unknown")
                 .createdAt(postEntity.getCreatedAt())
                 .updatedAt(postEntity.getUpdatedAt())
                 .build();
