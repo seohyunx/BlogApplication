@@ -1,11 +1,14 @@
 package com.shr.blog.service;
 
 import com.shr.blog.domain.PostEntity;
+import com.shr.blog.domain.User;
 import com.shr.blog.dto.PostDto;
 import com.shr.blog.repository.PostRepository;
+import com.shr.blog.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -20,6 +23,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     /**
      * createPost: 게시물을 추가하는 메서드
@@ -27,8 +31,11 @@ public class PostService {
      * @param postDto 등록할 게시물의 정보
      * @return 생성된 PostEntity 객체
      */
-    public PostEntity createPost(PostDto postDto) {
-        PostEntity postEntity = postRepository.save(postDto.toEntity());
+    public PostEntity createPost(PostDto postDto, User user) {
+        log.info("Creating post with writer ID: {}", user.getId());
+
+        PostEntity postEntity = postDto.toEntity(user);
+        postRepository.save(postEntity);
         log.info("Created Post ID: {}", postEntity.getId());
         return postEntity;
     }
@@ -63,11 +70,12 @@ public class PostService {
      * @return 수정된 PostEntity 객체
      */
     @Transactional
-    public PostEntity updatePost(Long id, @ModelAttribute PostDto postDto) {
+    public PostEntity updatePost(Long id, @ModelAttribute PostDto postDto, User user) {
         PostEntity postEntity = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
 
-        postEntity.update(postDto.getTitle(), postDto.getContent(), postDto.getWriter());
+        //postEntity.update(postDto.getTitle(), postDto.getContent());
+        postEntity.update(postDto.getTitle(), postDto.getContent(), user);
 
         return postEntity;
     }

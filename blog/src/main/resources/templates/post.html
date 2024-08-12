@@ -58,14 +58,15 @@
       <div class="btn-container">
         <a href="/blog" class="btn btn-secondary btn-sm">Main</a>
         <div>
-          <a
-            th:href="@{/blog/edit/{id}(id=${post.id})}"
+          <a th:if="${post.writer == currentUser.nickname}"
+             th:href="@{/blog/edit/{id}(id=${post.id})}"
             class="btn btn-outline-secondary btn-sm mr-1"
           >
             Update
           </a>
           <form
             id="deleteForm"
+            th:if="${post.writer == currentUser.nickname}"
             th:action="@{/blog/delete/{id}(id=${post.id})}"
             method="post"
             style="display: inline"

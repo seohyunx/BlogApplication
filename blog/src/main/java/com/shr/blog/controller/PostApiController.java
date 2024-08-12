@@ -1,11 +1,16 @@
 package com.shr.blog.controller;
 
 import com.shr.blog.domain.PostEntity;
+import com.shr.blog.domain.User;
 import com.shr.blog.dto.PostDto;
+import com.shr.blog.dto.UserDto;
 import com.shr.blog.service.PostService;
+import com.shr.blog.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +25,7 @@ import java.util.stream.Collectors;
 public class PostApiController {
 
     private final PostService postService;
+    private final UserService userService;
 
     /**
      * getAllPosts: 모든 게시물을 조회하는 메서드
@@ -54,10 +60,15 @@ public class PostApiController {
      * @return 생성된 게시물 정보를 담은 ResponseEntity<PostDto>
      */
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
-        PostEntity postEntity = postService.createPost(postDto);
+    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto, Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userService.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        PostEntity postEntity = postService.createPost(postDto, user);
         return ResponseEntity.ok(PostEntity.toDto(postEntity));
     }
+
 
     /**
      * updatePost: 기존 게시물을 수정하는 메서드
@@ -67,9 +78,10 @@ public class PostApiController {
      * @return 수정된 게시물 정보를 담은 ResponseEntity<PostDto>
      */
     @PutMapping("/{id}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @ModelAttribute PostDto postDto) {
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @ModelAttribute PostDto postDto, @RequestHeader UserDto userDto, User user) {
         log.info("Update request ID: {}", id);
-        PostEntity postEntity = postService.updatePost(id, postDto);
+        log.info("nickname: {}", userDto.getNickname());
+        PostEntity postEntity = postService.updatePost(id, postDto, user);
         return ResponseEntity.ok(PostEntity.toDto(postEntity));
     }
 

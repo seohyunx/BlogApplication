@@ -36,11 +36,7 @@
                 placeholder="Title"
                 th:field="*{title}"
               />
-              <input
-                class="form-control mb-4"
-                placeholder="Writer"
-                th:field="*{writer}"
-              />
+              <div class="form-control mb-4" th:text="${user.nickname}"></div>
               <textarea
                 class="form-control h-25 mb-5"
                 rows="10"

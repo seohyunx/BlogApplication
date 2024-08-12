@@ -1,6 +1,7 @@
 package com.shr.blog.persistence;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -20,6 +21,7 @@ public class JDBCTest {
     }
 
     @Test
+    @DisplayName("H2 Database 연결 성공")
     public void testConnection() {
         Connection connection = null;
         try {
