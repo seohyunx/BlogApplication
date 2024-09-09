@@ -96,4 +96,14 @@ public class PostApiController {
         postService.deletePost(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * 게시물 검색
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<PostDto>> searchPosts(@RequestParam("keyword") String keyword) {
+        List<PostDto> searchResults = postService.searchPosts(keyword);
+
+        return ResponseEntity.ok(searchResults);
+    }
 }

@@ -96,4 +96,18 @@ public class PostViewController {
             return "redirect:/blog/posts/" + postDto.getId();
         }
     }
+
+    /**
+     * 게시물 검색
+     */
+    @GetMapping("/search")
+    public String searchPosts(@RequestParam("keyword") String keyword, Model model, Authentication authentication) {
+        List<PostDto> searchResults = postService.searchPosts(keyword);
+        model.addAttribute("board", searchResults);
+
+        User user = (User) authentication.getPrincipal();
+        model.addAttribute("user", user);
+
+        return "board";
+    }
 }
