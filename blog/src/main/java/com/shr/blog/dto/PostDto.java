@@ -4,7 +4,6 @@ import com.shr.blog.domain.PostEntity;
 import com.shr.blog.domain.User;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +20,7 @@ public class PostDto {
     private Long id;
     private String title;
     private String content;
-    private String writer;
+    private User writer;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

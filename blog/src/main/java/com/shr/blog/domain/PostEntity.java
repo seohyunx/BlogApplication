@@ -50,10 +50,12 @@ public class PostEntity {
     }
 
     // update: 요청받은 내용으로 값을 수정하는 메서드
-    public void update(String title, String content, User writer) {
+    public PostEntity update(String title, String content, User writer) {
         this.title = title;
         this.content = content;
         this.writer = writer;
+
+        return this;
     }
 
     /**
@@ -67,7 +69,7 @@ public class PostEntity {
                 .id(postEntity.getId())
                 .title(postEntity.getTitle())
                 .content(postEntity.getContent())
-                .writer(postEntity.getWriter() != null ? postEntity.getWriter().getNickname() : "Unknown")
+                .writer(postEntity.getWriter())
                 .createdAt(postEntity.getCreatedAt())
                 .updatedAt(postEntity.getUpdatedAt())
                 .build();

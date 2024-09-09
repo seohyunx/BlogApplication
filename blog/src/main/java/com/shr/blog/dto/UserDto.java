@@ -1,5 +1,6 @@
 package com.shr.blog.dto;
 
+import com.shr.blog.domain.User;
 import lombok.*;
 
 /**
@@ -15,4 +16,12 @@ public class UserDto {
     private String email;
     private String password;
     private String nickname;
+
+    public User toEntity() {
+        return User.builder()
+                .email(this.email)
+                .password(this.password)
+                .nickname(this.nickname)
+                .build();
+    }
 }

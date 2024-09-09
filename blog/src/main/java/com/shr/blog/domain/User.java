@@ -1,6 +1,7 @@
 package com.shr.blog.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,12 +14,13 @@ import java.util.List;
 
 /**
  * User 엔티티
- * -> User 테이블과 매핑될 엔티티 클래스
+ * -> Users 테이블과 매핑될 엔티티 클래스
  */
 @Table(name = "users")
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class User implements UserDetails {
 
     @Id
@@ -32,7 +34,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @OneToMany(mappedBy = "writer")

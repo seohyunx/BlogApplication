@@ -56,7 +56,7 @@ class PostServiceTest {
         Mockito.when(postRepository.save(any(PostEntity.class))).thenReturn(savedPostEntity);
 
         // when
-        PostEntity result = postService.createPost(postDto, user);
+        PostDto result = postService.createPost(postDto, user);
 
         // then
         assertThat(result).isNotNull();

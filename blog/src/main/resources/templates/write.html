@@ -18,8 +18,12 @@
     <div class="container mt-5">
       <div class="row d-flex justify-content-center">
         <div class="col-lg-8">
-          <form th:action="@{/blog/edit}" th:object="${postDto}" method="post">
-            <!-- PUT 요청 처리하기 위해 Hidden Method 추가 (Overloaded Post) -->
+          <form
+            th:action="@{/blog/posts/write}"
+            th:object="${postDto}"
+            method="post"
+          >
+            <!-- PUT 요청 처리하기 위해 Hidden Method 추가 -->
             <!-- <input type="hidden" name="_method" value="PUT" /> -->
 
             <input
@@ -36,7 +40,11 @@
                 placeholder="Title"
                 th:field="*{title}"
               />
-              <div class="form-control mb-4" th:text="${user.nickname}"></div>
+              <div
+                class="form-control mb-4"
+                th:text="${user.nickname}"
+                th:field="*{writer}"
+              ></div>
               <textarea
                 class="form-control h-25 mb-5"
                 rows="10"
@@ -49,7 +57,9 @@
               <button type="submit" class="btn btn-secondary btn-sm">
                 Save
               </button>
-              <a href="/blog" class="btn btn-secondary btn-sm">Cancel</a>
+              <a href="/blog/posts" class="btn btn-outline-secondary btn-sm"
+                >Cancel</a
+              >
             </div>
           </form>
         </div>

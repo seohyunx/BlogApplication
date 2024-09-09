@@ -27,7 +27,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("save: User 회원가입 성공")
-    void save() {
+    public void save() {
         // given
         UserDto userDto = UserDto.builder()
                 .email("test@gmail.com")
@@ -36,10 +36,10 @@ class UserServiceTest {
                 .build();
 
         // when
-        User savedUserId = userService.save(userDto);
+        User savedUserId = userService.createUser(userDto);
 
         // then
-        User savedUser = userRepository.findById(savedUserId).orElse(null);
+        User savedUser = userRepository.findById(savedUserId.getId()).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo("test@gmail.com");
         assertThat(savedUser.getNickname()).isEqualTo("test_nickname");

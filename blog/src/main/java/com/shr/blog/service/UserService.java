@@ -4,6 +4,7 @@ import com.shr.blog.domain.User;
 import com.shr.blog.dto.UserDto;
 import com.shr.blog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +14,22 @@ import java.util.Optional;
  * 객체를 인수로 받는 회원 정보 추가 메서드 작성
  */
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User save(UserDto dto) {
+    public User createUser(UserDto userDto) {
         User user = User.builder()
-                .email(dto.getEmail())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .nickname(dto.getNickname())
+                .email(userDto.getEmail())
+                .password(passwordEncoder.encode(userDto.getPassword()))
+                .nickname(userDto.getNickname())
                 .build();
+
+        log.info("Save User Email: {}", userDto.getEmail());
+
         return userRepository.save(user);
     }
 

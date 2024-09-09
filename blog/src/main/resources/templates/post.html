@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Post Detail</title>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
@@ -12,28 +14,32 @@
         font-size: 24px;
         font-weight: bold;
       }
+
       .post-content {
         margin-top: 20px;
       }
+
       .post-info {
         margin-top: 10px;
         font-size: 14px;
         color: gray;
       }
+
       .btn-container {
         margin-top: 70px;
         display: flex;
         justify-content: space-between;
       }
-    </style>
-    <script>
-      function confirmDeletion(event, formId) {
-        event.preventDefault();
-        if (confirm("Are you sure you want to delete this post?")) {
-          document.getElementById(formId).submit(); // 삭제 확인하기
-        }
+
+      .comment-form-container {
+        display: none;
+        margin-top: 10px;
       }
-    </script>
+
+      .comment-form-container.active {
+        display: block;
+      }
+    </style>
   </head>
   <body>
     <div class="p-3 mb-5 text-center bg-light">
@@ -44,30 +50,42 @@
       <div class="post-detail">
         <div class="post-title" th:text="${post.title}">Post Title</div>
         <div class="post-info">
-          <span th:text="'Writer: ' + ${post.writer}"></span> |
           <span
-            th:text="'Date: ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm:ss')}"
+            th:if="${post != null && post.writer != null}"
+            th:text="'Writer: ' + ${post.writer.nickname}"
+            >Writer</span
+          >
+          <span
+            th:if="${post == null || post.writer == null}"
+            th:text="'Writer: Unknown'"
           ></span>
           <span
-            th:if="${post.updatedAt != post.createdAt}"
+            th:text="'| Date: ' + (${post?.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm:ss') : 'Unknown'})"
+            >Created Date</span
+          >
+          <span
+            th:if="${post?.updatedAt != null && post.updatedAt != post.createdAt}"
             th:text="'| Updated Date: ' + ${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm:ss')}"
-          ></span>
+            >Updated Date</span
+          >
         </div>
+
         <div class="post-content" th:text="${post.content}">Post Content</div>
       </div>
       <div class="btn-container">
-        <a href="/blog" class="btn btn-secondary btn-sm">Main</a>
+        <a href="/blog/posts" class="btn btn-secondary btn-sm">Main</a>
         <div>
-          <a th:if="${post.writer == currentUser.nickname}"
-             th:href="@{/blog/edit/{id}(id=${post.id})}"
+          <a
+            th:if="${post.writer?.nickname == currentUser?.nickname}"
+            th:href="@{/blog/posts/{id}/edit(id=${post.id})}"
             class="btn btn-outline-secondary btn-sm mr-1"
           >
             Update
           </a>
           <form
             id="deleteForm"
-            th:if="${post.writer == currentUser.nickname}"
-            th:action="@{/blog/delete/{id}(id=${post.id})}"
+            th:if="${post.writer?.nickname == currentUser?.nickname}"
+            th:action="@{/blog/posts/{id}/delete(id=${post.id})}"
             method="post"
             style="display: inline"
           >
@@ -81,6 +99,180 @@
           </form>
         </div>
       </div>
+
+      <div class="comments-section mt-5">
+        <h5>Comments</h5>
+        <div id="comments-container">
+          <!-- 댓글이 여기에 동적으로 추가됨 -->
+        </div>
+      </div>
+
+      <form id="comment-form">
+        <div class="form-group row">
+          <div class="col-10">
+            <textarea
+              id="comment-content"
+              name="content"
+              class="form-control"
+              placeholder="Write a comment"
+            ></textarea>
+          </div>
+          <div class="col-2 text-right">
+            <button type="submit" class="btn btn-secondary btn-sm">
+              Add Comment
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      let postId = "[[${post.id}]]";
+      let currentUserNickname = "[[${currentUser.nickname}]]";
+
+      // 댓글 목록을 서버에서 가져와서 표시
+      function loadComments() {
+        $.ajax({
+          url: `/api/posts/${postId}/comments`,
+          type: "GET",
+          success: function (comments) {
+            $("#comments-container").empty();
+            comments.forEach(function (comment) {
+              const isCommentWriter =
+                comment.writerNickname === currentUserNickname;
+
+              const createdAt = new Date(comment.createdAt).toLocaleString();
+              const updatedAt =
+                comment.updatedAt != comment.createdAt
+                  ? new Date(comment.updatedAt).toLocaleString()
+                  : null;
+              console.log("comment: ", comment);
+              $("#comments-container").append(`
+                <div class="comment" id="comment-${comment.id}">
+                    <strong>${comment.writerNickname}</strong>
+                    <p>${comment.content}</p>
+                    <span>Created: ${createdAt}</span>
+                    ${updatedAt ? `<span> | Updated: ${updatedAt}</span>` : ""}
+                    ${
+                      isCommentWriter
+                        ? `<div>
+                             <button class="btn btn-sm btn-outline-secondary" onclick="showEditForm(${comment.id}, '${comment.content}')">Edit</button>
+                             <button class="btn btn-sm btn-outline-danger" onclick="deleteComment(${postId}, ${comment.id})">Delete</button>
+                           </div>
+                           <div id="edit-form-container-${comment.id}" class="comment-form-container">
+                            <textarea id="edit-content-${comment.id}" class="form-control mb-2">${comment.content}</textarea>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="updateComment(${postId}, ${comment.id})">Update</button>
+                            <button class="btn btn-secondary btn-sm" onclick="hideEditForm(${comment.id})">Cancel</button>
+                          </div>`
+                        : ""
+                    }
+                    <hr>
+                </div>
+              `);
+            });
+          },
+          error: function (error) {
+            console.error("Error loading comments:", error);
+          },
+        });
+      }
+
+      $(document).ready(function () {
+        const token = $("meta[name='_csrf']").attr("content");
+        const header = $("meta[name='_csrf_header']").attr("content");
+
+        $.ajaxSetup({
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader(header, token);
+          },
+        });
+
+        console.log("Post ID:", postId);
+        console.log("Current User:", currentUserNickname);
+
+        // 페이지 로드 시 댓글 목록 초기화
+        loadComments();
+
+        // 댓글 추가 AJAX 요청
+        $("#comment-form").submit(function (event) {
+          event.preventDefault();
+          const content = $("#comment-content").val();
+
+          $.ajax({
+            url: `/api/posts/${postId}/comments`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ content: content }),
+            success: function () {
+              loadComments();
+              $("#comment-content").val("");
+            },
+            error: function (error) {
+              console.error("Error adding comment:", error);
+            },
+          });
+        });
+      });
+
+      // 댓글 수정 폼 보이기
+      function showEditForm(commentId, content) {
+        console.log(`Editing comment: ${commentId}`);
+        $(`#edit-form-container-${commentId}`).addClass("active");
+      }
+
+      // 댓글 수정 폼 숨기기
+      function hideEditForm(commentId) {
+        $(`#edit-form-container-${commentId}`).removeClass("active");
+      }
+
+      // 댓글 수정
+      function updateComment(postId, commentId) {
+        const newContent = $(`#edit-content-${commentId}`).val();
+        if (newContent) {
+          $.ajax({
+            url: `/api/posts/${postId}/comments/${commentId}`,
+            type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify({ content: newContent }),
+            success: function () {
+              loadComments();
+            },
+            error: function (error) {
+              if (error.status === 403) {
+                alert("You can only update your own comments.");
+                console.log("user", currentUserNickname);
+              } else {
+                console.error("Error updating comment:", error);
+              }
+            },
+          });
+        }
+      }
+
+      // 댓글 삭제
+      function deleteComment(postId, commentId) {
+        if (confirm("Are you sure you want to delete this comment?")) {
+          $.ajax({
+            url: `/api/posts/${postId}/comments/${commentId}`,
+            type: "DELETE",
+            success: function () {
+              loadComments();
+            },
+            error: function (error) {
+              console.error("Error deleting comment:", error);
+            },
+          });
+        }
+      }
+
+      // 게시물 삭제
+      function confirmDeletion(event, formId) {
+        event.preventDefault();
+        if (confirm("Are you sure you want to delete this post?")) {
+          document.getElementById(formId).submit(); // 삭제 확인하기
+        }
+      }
+    </script>
   </body>
 </html>
