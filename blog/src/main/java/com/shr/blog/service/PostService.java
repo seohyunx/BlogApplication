@@ -91,4 +91,15 @@ public class PostService {
         postRepository.deleteById(id);
         log.info("Deleted Post ID: {}", id);
     }
+
+    /**
+     * 게시물을 검색하는 메서드
+     */
+    public List<PostDto> searchPosts(String keyword) {
+        List<PostEntity> postEntities = postRepository.searchPosts(keyword);
+
+        return postEntities.stream()
+                .map(PostEntity::toDto)
+                .collect(Collectors.toList());
+    }
 }

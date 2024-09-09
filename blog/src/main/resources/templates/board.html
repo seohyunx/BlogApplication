@@ -33,6 +33,10 @@
     <div class="container">
       <div class="row mb-3">
         <div class="col-lg-10"></div>
+        <form th:action="@{/blog/posts/search}" method="get">
+          <input type="text" name="keyword" placeholder="Search Keyword">
+          <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+        </form>
         <div class="col-lg row justify-content-end">
           <div class="row text-right mr-4 mt-2">
             <h6 class="ml-1">Hello,&nbsp;&nbsp;</h6>
