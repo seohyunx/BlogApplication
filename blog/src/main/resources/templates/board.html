@@ -33,15 +33,15 @@
     <div class="container">
       <div class="row mb-3">
         <div class="col-lg-10"></div>
-        <div class="col-lg-2 row justify-content-end">
+        <div class="col-lg row justify-content-end">
           <div class="row text-right mr-4 mt-2">
+            <h6 class="ml-1">Hello,&nbsp;&nbsp;</h6>
             <h6 th:text="${user.nickname}"></h6>
-            <h6 class="ml-1">님 안녕하세요!</h6>
           </div>
           <button
             type="button"
             id="create-btn"
-            th:onclick="|location.href='@{/blog/write}'|"
+            th:onclick="|location.href='@{/blog/posts/write}'|"
             class="btn btn-secondary btn-sm"
           >
             Write
@@ -64,11 +64,15 @@
               <a
                 class="card-title"
                 th:text="${item.title}"
-                th:href="@{/blog/{id}(id=${item.id})}"
+                th:href="@{/blog/posts/{id}(id=${item.id})}"
                 >Title</a
               >
             </td>
-            <td th:text="${item.writer != null ? item.writer : 'Unknown'}">Writer</td>
+            <td
+              th:text="${item.writer != null ? item.writer.nickname : 'Unknown'}"
+            >
+              Writer
+            </td>
             <td
               id="table-createdAt"
               th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd')}"
@@ -76,7 +80,7 @@
           </tr>
         </tbody>
       </table>
-      <form th:action="@{/logout}" method="post">
+      <form th:action="@{/blog/logout}" method="post">
         <input
           type="hidden"
           th:name="${_csrf.parameterName}"

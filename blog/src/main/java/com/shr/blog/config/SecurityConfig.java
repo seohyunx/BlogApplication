@@ -29,23 +29,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // .csrf(AbstractHttpConfigurer::disable)     // CSRF 보호 비활성화
+                //.csrf(AbstractHttpConfigurer::disable)     // CSRF 보호 비활성화
                 .securityMatcher("/**")          // /** 경로로 들어오는 모든 요청에 대해 HttpSecurity 적용
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/signup").permitAll()
+                        .requestMatchers("/blog/login", "/blog/signup", "/api/blog/signup", "/swagger-ui/index.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/login")
-                        .loginProcessingUrl("/perform_login")
-                        .defaultSuccessUrl("/blog", true)
-                        .failureUrl("/login?error=true")
+                        .loginPage("/blog/login")
+                        .loginProcessingUrl("/blog/login")
+                        .defaultSuccessUrl("/blog/posts", true)
+                        .failureUrl("/blog/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
+                        .logoutUrl("/blog/logout")
+                        .logoutSuccessUrl("/blog/login")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(false)
                         .permitAll()
