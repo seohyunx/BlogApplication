@@ -4814,3 +4814,6 @@ Caused by: java.lang.AssertionError: 172032 != 167936
 	at org.h2.mvstore.RandomAccessStore.writeChunk(RandomAccessStore.java:28)
 	at org.h2.mvstore.FileStore.storeBuffer(FileStore.java:1524)
 	... 6 more
+2024-09-11 18:36:14.124496+09:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select * [*]froom file"; SQL statement:
+select * froom file [42000-224]

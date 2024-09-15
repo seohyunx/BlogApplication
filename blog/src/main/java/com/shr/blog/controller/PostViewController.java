@@ -1,5 +1,6 @@
 package com.shr.blog.controller;
 
+import com.shr.blog.domain.PostFile;
 import com.shr.blog.domain.User;
 import com.shr.blog.dto.PostDto;
 import com.shr.blog.service.PostService;
@@ -11,7 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -51,9 +54,11 @@ public class PostViewController {
         User user = (User) authentication.getPrincipal();
         model.addAttribute("currentUser", user);
 
+        List<PostFile> files = postService.getFilesByPostId(id);
+        model.addAttribute("files", files);
+
         return "post";
     }
-
 
     /**
      * 새 게시물 작성 및 수정 폼 표시
@@ -66,6 +71,9 @@ public class PostViewController {
         } else {
             PostDto postDto = postService.getPostById(id);
             model.addAttribute("postDto", postDto);
+
+            List<PostFile> files = postService.getFilesByPostId(id);
+            model.addAttribute("files", files);
         }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -80,21 +88,31 @@ public class PostViewController {
      * 게시물 생성 및 수정 처리
      */
     @PostMapping({"/write", "/edit"})
-    public String createPost(@ModelAttribute PostDto postDto, Authentication authentication) {
+    public String createPost(@ModelAttribute PostDto postDto, Authentication authentication,
+                             @RequestParam MultipartFile[] files,
+                             @RequestParam(required = false) Long[] existingFileIds) throws IOException {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // 로그 추가: user가 올바르게 전달되고 있는지 확인
-        log.info("Saving post with user ID: {}", user.getId());
-
         if (postDto.getId() == null) {
-            PostDto createdPost = postService.createPost(postDto, user);
+            PostDto createdPost = postService.createPost(postDto, user, files);
             return "redirect:/blog/posts/" + createdPost.getId();
         } else {
-            postService.updatePost(postDto.getId(), postDto, user);
+            postService.updatePost(postDto.getId(), postDto, user, existingFileIds, files);
             return "redirect:/blog/posts/" + postDto.getId();
         }
+    }
+
+
+    /**
+     * 게시물 삭제
+     */
+    @PostMapping("/{id}/delete")
+    public String deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+
+        return "redirect:/blog/posts";
     }
 
     /**
