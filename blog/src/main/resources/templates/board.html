@@ -34,7 +34,7 @@
       <div class="row mb-3">
         <div class="col-lg-10"></div>
         <form th:action="@{/blog/posts/search}" method="get">
-          <input type="text" name="keyword" placeholder="Search Keyword">
+          <input type="text" name="keyword" placeholder="Search Keyword" />
           <button type="submit" class="btn btn-secondary btn-sm">Search</button>
         </form>
         <div class="col-lg row justify-content-end">
@@ -90,7 +90,9 @@
           th:name="${_csrf.parameterName}"
           th:value="${_csrf.token}"
         />
-        <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+        <button type="submit" class="btn btn-secondary btn-sm mb-5">
+          Logout
+        </button>
       </form>
     </div>
   </body>

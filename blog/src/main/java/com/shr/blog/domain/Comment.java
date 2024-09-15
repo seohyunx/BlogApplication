@@ -43,7 +43,6 @@ public class Comment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
     public Comment(String content, User writer, PostEntity post) {
         this.content = content;
         this.writer = writer;
@@ -53,10 +52,6 @@ public class Comment {
     public void updateContent(String content) {
         this.content = content;
     }
-
-//    public CommentDto toDto() {
-//        return Comment.generateDto(this);
-//    }
 
     public static CommentDto toDto(Comment comment) {
         return CommentDto.builder()

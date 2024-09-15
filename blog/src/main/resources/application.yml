@@ -35,3 +35,17 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+
+  servlet:      # 파일 저장 위치
+    multipart:
+      enabled: true
+      location: /Users/hyunrok/Git/BlogApplication/blog/src/main/resources/static/upload
+      max-request-size: 215MB
+      max-file-size: 200MB
+
+  resources:
+    static-locations: classpath:/static/, file:/Users/hyunrok/Git/BlogApplication/blog/src/main/resources/static/upload/
+
+file:
+  upload:
+    relative-path: /upload/

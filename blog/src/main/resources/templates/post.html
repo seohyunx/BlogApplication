@@ -69,7 +69,10 @@
             >Updated Date</span
           >
         </div>
-
+        <!-- 첨부 파일 -->
+        <div th:each="file : ${files}" class="mb-2">
+          <img th:src="${file.filePath}" class="post-file" alt="Image" />
+        </div>
         <div class="post-content" th:text="${post.content}">Post Content</div>
       </div>
       <div class="btn-container">
@@ -108,7 +111,7 @@
       </div>
 
       <form id="comment-form">
-        <div class="form-group row">
+        <div class="form-group row mb-5">
           <div class="col-10">
             <textarea
               id="comment-content"

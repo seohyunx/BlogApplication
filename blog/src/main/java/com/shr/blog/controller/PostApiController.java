@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -32,7 +35,7 @@ public class PostApiController {
      * @return 생성된 게시물 정보를 담은 ResponseEntity<PostDto>
      */
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto, Authentication authentication) {
+    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto, Authentication authentication, MultipartFile[] files) throws IOException {
         User user  = (User) authentication.getPrincipal();
         User userName = userService.findByEmail(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -40,7 +43,7 @@ public class PostApiController {
         log.info("postDto: {}", postDto.getContent());
         log.info("authentication: {}", ((UserDetails) authentication.getPrincipal()).getUsername());
 
-        PostDto createdPost = postService.createPost(postDto, userName);
+        PostDto createdPost = postService.createPost(postDto, userName, files);
         return ResponseEntity.ok(createdPost);
     }
 
@@ -77,10 +80,10 @@ public class PostApiController {
      * @return 수정된 게시물 정보를 담은 ResponseEntity<PostDto>
      */
     @PutMapping("/{id}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @RequestBody PostDto postDto, @RequestHeader UserDto userDto, User user) {
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @RequestBody PostDto postDto, User user, Long[] existingFileIds, MultipartFile[] files) throws IOException {
         log.info("Update request ID: {}", id);
-        log.info("nickname: {}", userDto.getNickname());
-        PostDto updatedPost = postService.updatePost(id, postDto, user);
+        log.info("nickname: {}", user.getNickname());
+        PostDto updatedPost = postService.updatePost(id, postDto, user, existingFileIds, files);
 
         return ResponseEntity.ok(updatedPost);
     }

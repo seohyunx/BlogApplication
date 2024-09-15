@@ -9,6 +9,28 @@
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
     />
+    <style>
+      .file-input-wrapper {
+        display: block;
+        position: relative;
+        margin-bottom: 10px;
+      }
+      .clear-file {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: red;
+      }
+      .file-input-wrapper input[type="file"] {
+        width: 100%;
+        padding-right: 30px;
+      }
+    </style>
   </head>
   <body>
     <div class="p-3 mb-4 text-center bg-light">
@@ -22,17 +44,14 @@
             th:action="@{/blog/posts/write}"
             th:object="${postDto}"
             method="post"
+            enctype="multipart/form-data"
           >
-            <!-- PUT 요청 처리하기 위해 Hidden Method 추가 -->
-            <!-- <input type="hidden" name="_method" value="PUT" /> -->
-
             <input
               type="hidden"
               name="id"
               th:value="*{id}"
               th:if="${postDto}"
             />
-
             <div>
               <input
                 type="text"
@@ -45,6 +64,56 @@
                 th:text="${user.nickname}"
                 th:field="*{writer}"
               ></div>
+
+              <!-- 기존 파일 목록을 표시 -->
+              <div id="existing-file-list">
+                <h6>Existing Files:</h6>
+                <div th:each="file : ${files}" class="file-input-wrapper">
+                  <span th:text="${file.fileName}"></span>
+                  <button
+                    type="button"
+                    class="clear-file"
+                    onclick="removeExistingFile(file.id)"
+                  >
+                    &times;
+                  </button>
+                  <input
+                    type="hidden"
+                    name="existingFileIds"
+                    th:value="${file.id}"
+                  />
+                  <!-- 삭제되지 않은 기존 파일 ID -->
+                </div>
+              </div>
+
+              <!-- 파일 목록이 추가될 div -->
+              <div id="file-input-container">
+                <div class="file-input-wrapper">
+                  <input
+                    type="file"
+                    name="files"
+                    class="form-control"
+                    id="file-input"
+                  />
+                  <button
+                    type="button"
+                    class="clear-file"
+                    onclick="clearFileInput()"
+                    title="Clear File"
+                  >
+                    &times;
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-secondary btn-sm mb-4 h-25"
+                id="add-file-btn"
+              >
+                + Add File
+              </button>
+
+              <!-- Content -->
               <textarea
                 class="form-control h-25 mb-5"
                 rows="10"
@@ -65,5 +134,49 @@
         </div>
       </div>
     </div>
+
+    <script>
+      const fileInputContainer = document.getElementById(
+        "file-input-container"
+      );
+      const addFileBtn = document.getElementById("add-file-btn");
+
+      // 파일 선택 필드를 비우는 함수
+      function clearFileInput() {
+        document.getElementById("file-input").value = "";
+      }
+
+      // 추가적인 파일 input을 생성하는 로직
+      addFileBtn.addEventListener("click", () => {
+        const newFileInputWrapper = document.createElement("div");
+        newFileInputWrapper.classList.add("file-input-wrapper");
+
+        const newFileInput = document.createElement("input");
+        newFileInput.type = "file";
+        newFileInput.name = "files";
+        newFileInput.classList.add("form-control");
+
+        const clearButton = document.createElement("button");
+        clearButton.type = "button";
+        clearButton.classList.add("clear-file");
+        clearButton.innerHTML = "&times;";
+        clearButton.onclick = () => {
+          newFileInput.value = ""; // 파일 선택 필드를 비움
+        };
+
+        newFileInputWrapper.appendChild(newFileInput);
+        newFileInputWrapper.appendChild(clearButton);
+
+        fileInputContainer.appendChild(newFileInputWrapper);
+      });
+
+      // 기존 파일을 삭제하는 함수
+      function removeExistingFile(fileId) {
+        const fileElement = document.querySelector(`input[value="${fileId}"]`);
+        if (fileElement) {
+          fileElement.parentElement.remove(); // 파일 요소를 삭제
+        }
+      }
+    </script>
   </body>
 </html>

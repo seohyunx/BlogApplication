@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,11 +20,11 @@ import java.time.LocalDateTime;
 public class PostEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)     // ID 자동 증가
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false)
     private long id;
 
-    @Column(name = "title", nullable = false)               // 'title' 이라는 not null 컬럼과 매핑
+    @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "content", nullable = false)
@@ -42,11 +43,16 @@ public class PostEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // PostFile과의 연관 관계 설정 (OneToMany)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PostFile> files;
+
     @Builder            // 빌더 패턴으로 객체 생성
-    public PostEntity(String title, String content, User writer) {
+    public PostEntity(String title, String content, User writer, List<PostFile> files) {
         this.title = title;
         this.content = content;
         this.writer = writer;
+        this.files = files;
     }
 
     // update: 요청받은 내용으로 값을 수정하는 메서드
