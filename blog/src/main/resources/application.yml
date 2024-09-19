@@ -49,3 +49,7 @@ spring:
 file:
   upload:
     relative-path: /upload/
+
+jwt:
+  issuer: sh0501sh11@gmail.com
+  secret_key: blog-springboot
