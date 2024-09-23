@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true) // OAuth2 사용자는 비밀번호가 없을 수 있으므로 nullable로 설정
     private String password;
 
     @Column(nullable = false, unique = true)
@@ -91,5 +91,12 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    // 사용자 이름 변경
+    public User update(String nickname) {
+        this.nickname = nickname;
+
+        return this;
     }
 }

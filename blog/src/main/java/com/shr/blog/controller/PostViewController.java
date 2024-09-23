@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +31,24 @@ public class PostViewController {
      * 모든 게시물 조회
      */
     @GetMapping()
-    // Model 객체: Controller에서 생성한 데이터를 담아서 View로 전달할 때 사용하는 객체
     public String getAllPosts(Model model, Authentication authentication) {
         List<PostDto> board = postService.getAllPosts();
         model.addAttribute("board", board);
 
-        User user = (User) authentication.getPrincipal();
-        model.addAttribute("user", user);
+        if (authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            log.info("FormLogin User Login");
+            model.addAttribute("user", user);
+        }
+        else if (authentication.getPrincipal() instanceof OAuth2User) {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            log.info("OAuth2 User Login");
+
+            // model.addAttribute("user", oAuth2User);
+
+            String nickname = (String) oAuth2User.getAttributes().get("name");
+            model.addAttribute("user", new User(null, null, nickname));
+        }
 
         return "board";
     }
@@ -51,8 +63,19 @@ public class PostViewController {
 
         log.info("Post ID: {}", postDto.getId());
 
-        User user = (User) authentication.getPrincipal();
-        model.addAttribute("currentUser", user);
+        if (authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            log.info("FormLogin User Login");
+            model.addAttribute("currentUser", user);
+        }
+        else if (authentication.getPrincipal() instanceof OAuth2User) {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            log.info("OAuth2 User Login");
+
+            String nickname = (String) oAuth2User.getAttributes().get("name");
+            model.addAttribute("currentUser", new User(null, null, nickname));
+            //model.addAttribute("currentUser", oAuth2User);
+        }
 
         List<PostFile> files = postService.getFilesByPostId(id);
         model.addAttribute("files", files);
@@ -76,10 +99,19 @@ public class PostViewController {
             model.addAttribute("files", files);
         }
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User user = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        model.addAttribute("user", user);
+        if (authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            log.info("FormLogin User Login");
+            model.addAttribute("user", user);
+        }
+        else if (authentication.getPrincipal() instanceof OAuth2User) {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            log.info("OAuth2 User Login");
+
+            // OAuth2 사용자 정보에서 nickname 추출
+            String nickname = (String) oAuth2User.getAttributes().get("name");
+            model.addAttribute("user", new User(null, null, nickname));
+        }
 
         return "write";
     }

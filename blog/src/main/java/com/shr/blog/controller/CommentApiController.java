@@ -1,13 +1,11 @@
 package com.shr.blog.controller;
 
-import com.shr.blog.domain.Comment;
 import com.shr.blog.domain.User;
 import com.shr.blog.dto.CommentDto;
 import com.shr.blog.service.CommentService;
 import com.shr.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

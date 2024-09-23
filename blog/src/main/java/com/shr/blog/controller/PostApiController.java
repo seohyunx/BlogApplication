@@ -2,7 +2,6 @@ package com.shr.blog.controller;
 
 import com.shr.blog.domain.User;
 import com.shr.blog.dto.PostDto;
-import com.shr.blog.dto.UserDto;
 import com.shr.blog.service.PostService;
 import com.shr.blog.service.UserService;
 import lombok.RequiredArgsConstructor;

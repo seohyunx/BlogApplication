@@ -4817,3 +4817,6 @@ Caused by: java.lang.AssertionError: 172032 != 167936
 2024-09-11 18:36:14.124496+09:00 jdbc[13]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select * [*]froom file"; SQL statement:
 select * froom file [42000-224]
+2024-10-13 01:42:40.792976+09:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "ALTER TABLE users [*]MODIFY COLUMN password VARCHAR(255) NULL"; expected "., ADD, SET, RENAME, DROP, ALTER"; SQL statement:
+ALTER TABLE users MODIFY COLUMN password VARCHAR(255) NULL [42001-224]
