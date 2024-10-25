@@ -5,6 +5,7 @@ import com.shr.blog.domain.User;
 import com.shr.blog.dto.PostDto;
 import com.shr.blog.service.PostService;
 import com.shr.blog.service.UserService;
+import com.shr.blog.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -25,7 +26,7 @@ import java.util.List;
 public class PostViewController {
 
     private final PostService postService;
-    private final UserService userService;
+    private final AuthenticationUtil authenticationUtil;
 
     /**
      * 모든 게시물 조회
@@ -35,20 +36,8 @@ public class PostViewController {
         List<PostDto> board = postService.getAllPosts();
         model.addAttribute("board", board);
 
-        if (authentication.getPrincipal() instanceof User) {
-            User user = (User) authentication.getPrincipal();
-            log.info("FormLogin User Login");
-            model.addAttribute("user", user);
-        }
-        else if (authentication.getPrincipal() instanceof OAuth2User) {
-            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-            log.info("OAuth2 User Login");
-
-            // model.addAttribute("user", oAuth2User);
-
-            String nickname = (String) oAuth2User.getAttributes().get("name");
-            model.addAttribute("user", new User(null, null, nickname));
-        }
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
+        model.addAttribute("user", user);
 
         return "board";
     }
@@ -61,21 +50,8 @@ public class PostViewController {
         PostDto postDto = postService.getPostById(id);
         model.addAttribute("post", postDto);
 
-        log.info("Post ID: {}", postDto.getId());
-
-        if (authentication.getPrincipal() instanceof User) {
-            User user = (User) authentication.getPrincipal();
-            log.info("FormLogin User Login");
-            model.addAttribute("currentUser", user);
-        }
-        else if (authentication.getPrincipal() instanceof OAuth2User) {
-            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-            log.info("OAuth2 User Login");
-
-            String nickname = (String) oAuth2User.getAttributes().get("name");
-            model.addAttribute("currentUser", new User(null, null, nickname));
-            //model.addAttribute("currentUser", oAuth2User);
-        }
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
+        model.addAttribute("currentUser", user);
 
         List<PostFile> files = postService.getFilesByPostId(id);
         model.addAttribute("files", files);
@@ -99,19 +75,8 @@ public class PostViewController {
             model.addAttribute("files", files);
         }
 
-        if (authentication.getPrincipal() instanceof User) {
-            User user = (User) authentication.getPrincipal();
-            log.info("FormLogin User Login");
-            model.addAttribute("user", user);
-        }
-        else if (authentication.getPrincipal() instanceof OAuth2User) {
-            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-            log.info("OAuth2 User Login");
-
-            // OAuth2 사용자 정보에서 nickname 추출
-            String nickname = (String) oAuth2User.getAttributes().get("name");
-            model.addAttribute("user", new User(null, null, nickname));
-        }
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
+        model.addAttribute("user", user);
 
         return "write";
     }
@@ -123,9 +88,8 @@ public class PostViewController {
     public String createPost(@ModelAttribute PostDto postDto, Authentication authentication,
                              @RequestParam MultipartFile[] files,
                              @RequestParam(required = false) Long[] existingFileIds) throws IOException {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User user = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
 
         if (postDto.getId() == null) {
             PostDto createdPost = postService.createPost(postDto, user, files);
@@ -135,7 +99,6 @@ public class PostViewController {
             return "redirect:/blog/posts/" + postDto.getId();
         }
     }
-
 
     /**
      * 게시물 삭제
@@ -155,7 +118,7 @@ public class PostViewController {
         List<PostDto> searchResults = postService.searchPosts(keyword);
         model.addAttribute("board", searchResults);
 
-        User user = (User) authentication.getPrincipal();
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
         model.addAttribute("user", user);
 
         return "board";

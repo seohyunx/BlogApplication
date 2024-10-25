@@ -4,10 +4,14 @@ import com.shr.blog.domain.User;
 import com.shr.blog.dto.CommentDto;
 import com.shr.blog.service.CommentService;
 import com.shr.blog.service.PostService;
+import com.shr.blog.service.UserService;
+import com.shr.blog.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,14 +23,14 @@ import java.util.List;
 public class CommentApiController {
 
     private final CommentService commentService;
-    private final PostService postService;
+    private final AuthenticationUtil authenticationUtil;
 
     /**
      * 댓글 작성
      */
     @PostMapping
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId, @RequestBody CommentDto commentDto, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
         CommentDto createdComment = commentService.createComment(postId, commentDto, user);
 
         return ResponseEntity.ok(createdComment);
@@ -47,8 +51,7 @@ public class CommentApiController {
      */
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
         CommentDto updatedComment = commentService.updateComment(commentId, commentDto.getContent(), user);
 
         return ResponseEntity.ok(updatedComment);
@@ -59,9 +62,7 @@ public class CommentApiController {
      */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-
-        // 댓글 가져오기
+        User user = authenticationUtil.getAuthenticatedUser(authentication);
         commentService.deleteComment(commentId, user);
 
         return ResponseEntity.noContent().build();

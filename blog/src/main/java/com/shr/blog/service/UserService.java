@@ -22,6 +22,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public User createUser(UserDto userDto) {
+        if (userRepository.existsByNickname(userDto.getNickname())) {
+            throw new IllegalArgumentException("Nickname already exists");
+        }
         User user = User.builder()
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))

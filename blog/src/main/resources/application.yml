@@ -14,11 +14,12 @@ spring:
       path: /h2-console
 
   thymeleaf:    # 타임리프 템플릿 경로 설정
-    # prefix: classpath:/templates/
-    # suffix: .html
-    prefix: file:src/main/resources/templates/  # 개발 중에 변경사항을 바로바로 확인하기 위해서
+    prefix: classpath:/templates/
+    suffix: .html
+    # prefix: file:src/main/resources/templates/  # 개발 중에 변경사항을 바로바로 확인하기 위해서
     cache: false                                # 실제 서비스 중에는 cache를 true로 살려야 함
 
+  # AWS RDS 사용으로 인한 주석화
   datasource:
     url: jdbc:h2:file:./data/blog-db
     driver-class-name: org.h2.Driver
@@ -51,8 +52,10 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            # client-id: ${GOOGLE_CLIENT_ID}
+            # client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id:
+            client-secret:
             scope:
               - email
               - profile
