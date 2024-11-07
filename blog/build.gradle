@@ -1,6 +1,5 @@
 plugins {
 	id 'java'
-	id 'war'
 	id 'org.springframework.boot' version '3.3.2'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
@@ -22,12 +21,12 @@ tasks.withType(JavaCompile) {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.h2database:h2'
+	//runtimeOnly 'com.h2database:h2'
 
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
@@ -61,6 +60,9 @@ dependencies {
 
 	// .env 사용을 위한 spring-dotenv
 	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+
+	// MySQL
+	implementation 'mysql:mysql-connector-java:8.0.33'
 }
 
 tasks.named('test') {

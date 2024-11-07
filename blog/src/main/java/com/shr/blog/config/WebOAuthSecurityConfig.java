@@ -41,7 +41,7 @@ public class WebOAuthSecurityConfig {
                 .securityMatcher("/**")          // /** 경로로 들어오는 모든 요청에 대해 HttpSecurity 적용
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/blog/login", "/blog/signup", "/api/blog/signup", "/swagger-ui/index.html", "/api/token").permitAll()
+                        .requestMatchers("/", "/blog", "/blog/login", "/blog/signup", "/api/blog/signup", "/swagger-ui/index.html", "/api/token").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
@@ -82,6 +82,7 @@ public class WebOAuthSecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                                 new AntPathRequestMatcher("/api/**")));
+
         return http.build();
     }
 
